@@ -10,7 +10,7 @@
 
 一个原生 SwiftUI macOS 应用，用来扫描 Mac 上常见的垃圾文件位置，并提供按应用过滤、白名单保护、删除前确认、移到废纸篓和权限引导。
 
-## 当前能力
+## 功能
 
 - 原生 macOS 图形界面
 - 扫描常见垃圾目录
@@ -21,125 +21,46 @@
 - 权限不足分类单独展示
 - 首次启动权限引导
 
-## 工程结构
+## 安装与启动
 
-- `Package.swift`: Swift Package 清单，可直接被 Xcode 打开
-- `Sources/`: SwiftUI 应用源码
-- `Assets/`: 图标资源
-- `Assets/Branding/`: GitHub 展示用 Logo 和预览图
-- `scripts/build_release_app.sh`: Release 构建 `.app`
-- `scripts/sign_app.sh`: 使用 `Developer ID Application` 证书签名
-- `scripts/package_dmg.sh`: 打包 DMG
-- `scripts/notarize_dmg.sh`: 提交公证并 stapler
-- `scripts/verify_distribution.sh`: 验证签名和 Gatekeeper
-- `scripts/release.sh`: 一键串起完整官网分发流程
-- `scripts/generate_marketing_assets.py`: 生成 GitHub 展示素材
-- `.github/workflows/release.yml`: 推送 `v*` tag 后自动构建 GitHub Release
-- `.github/workflows/gitleaks.yml`: push 和 PR 自动扫描敏感信息
-- `RELEASE_NOTES.md`: GitHub Release 默认说明
+1. 下载并解压发布包。
+2. 将 `MacJunkScanner.app` 拖到 `Applications`，或放到任意你习惯的位置。
+3. 双击启动应用。
+4. 如果 macOS 首次拦截，右键应用后选择“打开”。
 
-## 开发运行
+## 使用说明
 
-方式一：用 Xcode
+### 1. 开始扫描
 
-1. 用 Xcode 打开当前目录，或直接打开 `Package.swift`
-2. 选择 `MacJunkScanner` 运行
+- 打开应用后点击 `开始扫描`
+- 左侧会显示分类列表，右侧显示当前分类详情
+- 勾选 `扫描已卸载应用残留` 后，会额外显示疑似残留文件
 
-方式二：本地生成调试 `.app`
+### 2. 筛选扫描结果
 
-```bash
-chmod +x build_app.sh
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./build_app.sh
-open /Users/trtan/Documents/Codex/Mac/tool/Scan/MacJunkScanner.app
-```
+- `应用关键字`：只看指定应用相关缓存或残留
+- `白名单`：输入关键字或绝对路径，避免误选
+- `显示数量`：控制每个分类展示的一级目录数量
+- `显示不存在的目录`：把空目录或不存在的目标也显示出来，方便排查路径问题
 
-## 官网分发
+### 3. 选择要清理的项目
 
-推荐使用 `Developer ID + notarization` 做 App Store 外分发。Apple 官方参考：
+- 所有项目都需要你手动勾选后才会加入清理队列
+- 普通项目显示 `加入清理`
+- 高风险项目显示 `允许清理`
+- `只全选低风险项` 只会勾选当前分类中的低风险项目
 
-- [Distributing software on macOS](https://developer.apple.com/macos/distribution/)
-- [Developer ID](https://developer.apple.com/developer-id/)
-- [Customizing the notarization workflow](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow)
-- [Submitting apps for notarization](https://developer.apple.com/help/app-store-connect/manage-builds/submit-builds-for-notarization/)
+### 4. 执行清理
 
-### 1. 准备证书
+- 默认操作是 `移到废纸篓`
+- 顶部会先显示 `已选中待清理` 的总大小
+- 点击 `移到废纸篓` 后，会再次确认应用名、路径和总大小
 
-你需要：
+### 5. 清空废纸篓
 
-- Apple Developer Program 账号
-- `Developer ID Application` 证书
-- Xcode 已安装并可用
-
-可以先查看本机可用签名身份：
-
-```bash
-security find-identity -v -p codesigning
-```
-
-### 2. Release 构建
-
-```bash
-chmod +x scripts/*.sh
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./scripts/build_release_app.sh
-```
-
-产物位置：
-
-- `dist/MacJunkScanner.app`
-
-### 3. Developer ID 签名
-
-```bash
-export SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
-./scripts/sign_app.sh
-```
-
-### 4. 打包 DMG
-
-```bash
-./scripts/package_dmg.sh
-```
-
-产物位置：
-
-- `dist/MacJunkScanner.dmg`
-
-### 5. 配置 notarization 凭据
-
-先在 keychain 中保存 notarytool 凭据：
-
-```bash
-xcrun notarytool store-credentials "macjunkscanner-notary" \
-  --apple-id "<APPLE_ID>" \
-  --team-id "<TEAM_ID>" \
-  --password "<APP_SPECIFIC_PASSWORD>"
-```
-
-然后设置：
-
-```bash
-export NOTARY_PROFILE="macjunkscanner-notary"
-```
-
-### 6. 提交公证并 stapler
-
-```bash
-./scripts/notarize_dmg.sh
-```
-
-### 7. 验证分发产物
-
-```bash
-./scripts/verify_distribution.sh
-```
-
-### 8. 一键跑完整发布链路
-
-```bash
-export SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
-export NOTARY_PROFILE="macjunkscanner-notary"
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./scripts/release.sh
-```
+- 选中左侧 `废纸篓` 分类时，会显示 `彻底清空废纸篓`
+- 这个操作会直接删除废纸篓内容，无法像“移到废纸篓”那样再恢复
+- 建议执行前先确认废纸篓里没有需要保留的文件
 
 ## 默认扫描范围
 
@@ -152,37 +73,15 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./scripts/release.sh
 - `~/Library/Containers/com.apple.mail/Data/Library/Mail Downloads`
 - `~/Library/Application Support/MobileSync/Backup`
 
-## 说明
+## 权限说明
 
-- `移到废纸篓` 是默认清理动作
-- `彻底清空废纸篓` 会直接删除废纸篓内容
-- 如果出现权限受限，应用会把相关分类单独列为“需要授权”
+- 某些目录需要 `完全磁盘访问` 才能读取
+- 如果应用检测到权限不足，会把相关分类单独列为 `需要授权`
+- 首次启动或首次扫描受限时，会弹出权限引导页
+- 开启路径：`系统设置` -> `隐私与安全性` -> `完全磁盘访问`
 
-## GitHub Releases 分发
+## 风险提示
 
-如果只是想把应用发布到 GitHub，可以直接使用未签名的 DMG 或 ZIP：
-
-```bash
-chmod +x scripts/*.sh
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./scripts/build_release_app.sh
-./scripts/package_dmg.sh
-cd dist
-ditto -c -k --sequesterRsrc --keepParent MacJunkScanner.app MacJunkScanner.app.zip
-```
-
-产物位置：
-
-- `dist/MacJunkScanner.dmg`
-- `dist/MacJunkScanner.app.zip`
-
-GitHub Actions 已配置好自动发布：
-
-- 推送 tag，例如 `v0.1.0`
-- 自动构建 `.dmg`、`.app.zip`
-- 自动生成 `sha256`
-- 自动创建 GitHub Release
-
-注意：
-
-- 这条 GitHub Releases 流程默认不做 Developer ID 签名和 notarization
-- 用户首次运行时，macOS 可能要求右键“打开”
+- `缓存`、`日志`、`DerivedData` 通常适合清理，但下次打开应用或编译项目时可能需要重新生成
+- `iOS 模拟器`、`Xcode Archives`、`iPhone 备份` 这类数据影响更大，清理前请务必确认
+- `移到废纸篓` 相对安全，`彻底清空废纸篓` 属于不可恢复操作
