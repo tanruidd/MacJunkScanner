@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Build release app
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/build_release_app.sh
+
+      - name: Package DMG
+        run: ./scripts/package_dmg.sh
+
+      - name: Create ZIP
+        run: |
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent MacJunkScanner.app MacJunkScanner.app.zip
+
+      - name: Generate checksums
+        run: |
+          cd dist
+          shasum -a 256 MacJunkScanner.dmg > MacJunkScanner.dmg.sha256
+          shasum -a 256 MacJunkScanner.app.zip > MacJunkScanner.app.zip.sha256
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md
+          files: |
+            dist/MacJunkScanner.dmg
+            dist/MacJunkScanner.app.zip
+            dist/MacJunkScanner.dmg.sha256
+            dist/MacJunkScanner.app.zip.sha256
