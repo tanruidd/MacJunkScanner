@@ -25,6 +25,7 @@
 - `scripts/verify_distribution.sh`: 验证签名和 Gatekeeper
 - `scripts/release.sh`: 一键串起完整官网分发流程
 - `.github/workflows/release.yml`: 推送 `v*` tag 后自动构建 GitHub Release
+- `.github/workflows/gitleaks.yml`: push 和 PR 自动扫描敏感信息
 - `RELEASE_NOTES.md`: GitHub Release 默认说明
 
 ## 开发运行
