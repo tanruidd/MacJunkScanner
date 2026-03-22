@@ -1,5 +1,9 @@
 # Mac Junk Scanner 0.1.0
 
+![Mac Junk Scanner Logo](https://raw.githubusercontent.com/tanruidd/MacJunkScanner/main/Assets/Branding/logo.png)
+
+![Mac Junk Scanner Preview](https://raw.githubusercontent.com/tanruidd/MacJunkScanner/main/Assets/Branding/release-preview.png)
+
 Mac Junk Scanner 的首个公开版本现已发布。
 
 这是一个面向 macOS 的原生中文清理工具，专注于帮助你更安全地识别和处理缓存、日志、开发产物以及疑似卸载残留文件。首版重点放在“看得清、选得明白、尽量避免误删”。

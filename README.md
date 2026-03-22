@@ -1,5 +1,13 @@
 # Mac Junk Scanner
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tanruidd/MacJunkScanner/main/Assets/Branding/logo.png" alt="Mac Junk Scanner Logo" width="160" />
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tanruidd/MacJunkScanner/main/Assets/Branding/release-preview.png" alt="Mac Junk Scanner Preview" width="900" />
+</p>
+
 一个原生 SwiftUI macOS 应用，用来扫描 Mac 上常见的垃圾文件位置，并提供按应用过滤、白名单保护、删除前确认、移到废纸篓和权限引导。
 
 ## 当前能力
@@ -18,12 +26,14 @@
 - `Package.swift`: Swift Package 清单，可直接被 Xcode 打开
 - `Sources/`: SwiftUI 应用源码
 - `Assets/`: 图标资源
+- `Assets/Branding/`: GitHub 展示用 Logo 和预览图
 - `scripts/build_release_app.sh`: Release 构建 `.app`
 - `scripts/sign_app.sh`: 使用 `Developer ID Application` 证书签名
 - `scripts/package_dmg.sh`: 打包 DMG
 - `scripts/notarize_dmg.sh`: 提交公证并 stapler
 - `scripts/verify_distribution.sh`: 验证签名和 Gatekeeper
 - `scripts/release.sh`: 一键串起完整官网分发流程
+- `scripts/generate_marketing_assets.py`: 生成 GitHub 展示素材
 - `.github/workflows/release.yml`: 推送 `v*` tag 后自动构建 GitHub Release
 - `.github/workflows/gitleaks.yml`: push 和 PR 自动扫描敏感信息
 - `RELEASE_NOTES.md`: GitHub Release 默认说明
